@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Register Custom Post Type Quiz
+add_action( 'init', 'create_quiz_cpt', 0 );
 function create_quiz_cpt() {
 
 	$labels = array(
@@ -72,9 +73,9 @@ function create_quiz_cpt() {
 	register_post_type( 'quiz', $args );
 
 }
-add_action( 'init', 'create_quiz_cpt', 0 );
 
 // Register Taxonomy Subject
+add_action( 'init', 'create_subject_tax' );
 function create_subject_tax() {
 
 	$labels = array(
@@ -107,4 +108,57 @@ function create_subject_tax() {
 	register_taxonomy( 'subject', array('quiz'), $args );
 
 }
-add_action( 'init', 'create_subject_tax' );
+
+// Register custom rest routes for quiz post type
+add_action( 'rest_api_init', 'create_custom_route' );
+function create_custom_route() {
+	register_rest_route(
+		'question-bank/v1/',
+		'get-quizzes',
+		[
+			'methods' => 'GET',
+			'callback' => 'get_quizzes',
+		]
+	);
+}
+
+// get quizzes list
+function get_quizzes() {
+
+	$sendResopnse = [];
+
+	// post query
+	$args = array(
+		'numberposts' => 10,
+		'post_type'   => 'quiz'
+	  );
+	   
+	  $quizzes = get_posts( $args );
+
+	  if($quizzes) {
+		foreach($quizzes as $key => $quiz) {
+
+			// get post content
+			$content = $quiz->post_content;
+			$content = apply_filters('the_content', $content);
+			$content = str_replace(']]>', ']]&gt;', $content);
+
+			// get post term
+			$term_obj_list = get_the_terms( $quiz->ID, 'subject' );
+			$terms_string = join(', ', wp_list_pluck($term_obj_list, 'name'));
+
+			// make response
+			$sendResopnse[$key] = [
+				'title'	=> get_the_title( $quiz->ID ),
+				'desc'	=> $content,
+				'image'	=> get_the_post_thumbnail_url($quiz->ID, 'medium'),
+				'subject' => $terms_string
+			];
+		}
+	  } else {
+
+		return new WP_Error( 'no_quiz_found', 'No quiz found', array( 'status' => 404 ) );
+	  }
+
+	return $sendResopnse;
+}
