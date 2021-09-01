@@ -1,0 +1,8 @@
+REST API - Next class task - 08-09-2021
+
+- Make another REST Route for get single quiz information
+- send author data
+- send posts date
+- send post slug
+- send post id
+
