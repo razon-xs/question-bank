@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: Question Bank
-Plugin URI: https://wordpress.org/plugins/wordpress-importer/
+Plugin URI: https://wordpress.org/plugins/xpeedstudio
 Description: Our question bank
 Author: xpeedstudion
-Author URI: https://wordpress.org/
+Author URI: https://xpeedstudio.com/
 Version: 1.0
 Text Domain: question-bank
 License: GPLv2 or later
