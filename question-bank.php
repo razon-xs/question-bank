@@ -120,6 +120,15 @@ function create_custom_route() {
 			'callback' => 'get_quizzes',
 		]
 	);
+
+	register_rest_route(
+		'question-bank/v1/',
+		'get-quiz/(?P<id>\d+)',
+		[
+			'methods' => 'GET',
+			'callback' => 'get_quiz',
+		]
+	);
 }
 
 // get quizzes list
@@ -149,6 +158,7 @@ function get_quizzes() {
 
 			// make response
 			$sendResopnse[$key] = [
+				'id'	=> $quiz->ID,
 				'title'	=> get_the_title( $quiz->ID ),
 				'desc'	=> $content,
 				'image'	=> get_the_post_thumbnail_url($quiz->ID, 'medium'),
@@ -161,4 +171,14 @@ function get_quizzes() {
 	  }
 
 	return $sendResopnse;
+}
+
+// get single quiz
+function get_quiz($request) {
+	$request->get_query_params();
+	$quiz_id = $request['id'];
+	
+	return [
+		'title'	=> get_the_title($quiz_id)
+	];
 }
